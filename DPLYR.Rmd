@@ -1,0 +1,391 @@
+---
+title: |
+  | Applications of R for Finance
+  | 
+author: |
+  | 
+  | 
+  | 
+date: "Date:`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+\newpage
+\tableofcontents
+\listoftables
+\newpage
+
+Part I 
+
+Load R packages
+
+Load the packages required. Consider using `dplyr` , `lubridate` , `knitr`
+
+```{r loadLibs, message=FALSE, warning=FALSE}
+library(dplyr)
+library(knitr)
+library(lubridate)
+
+```
+
+Loading Data
+
+Load `compustat_sec_2020_2023.csv` into a data frame.
+
+```{r loadData}
+raw_data <- read.csv("compustat_sec_2020_2023.csv")
+```
+
+Calculating Returns
+
+Calculate simple daily returns for each stock.
+**Ensure there are no `NA` values or `Inf` values in your returns column**
+
+```{r calculateReturns}
+data <- raw_data %>% 
+  # Sorting and arranging the row called 'tic' based on the 'datadate' column
+  arrange(tic, datadate) %>%
+  # Grouping data based on variable 'tic'
+  group_by(tic) %>% 
+  # Enables the creation of a new variable called 'returns', which is the daily
+  # return as a percentage change. It divides the 'prccd' column by the lagged 
+  # 'prccd' (the previous day's closing price) and subtracts 1 from the result.
+  mutate(returns = prccd / lag(prccd) -1) %>%
+  # Modify the 'datadate' column to make it the correct format
+  mutate(datadate = as.Date(datadate, format = "%Y-%m-%d")) %>% 
+  # Remove grouping
+  ungroup %>% 
+  # To omit the 'NA' values
+  na.omit()
+
+# To make sure there is no 'Inf' values
+data <- data[is.finite(data$returns), ]
+# Check the first few rows of the data frame
+head(data)
+
+```
+
+Create a new data frame containing the maximum daily return for each month, for
+each stock. For each stock in the data frame, each row should represent the
+maximum daily return in a given month.
+
+(i.e., select the row with the maximum return in each month, for each stock)
+
+**NOTES**:
+- Keep all the columns of the original data frame
+
+- Keep only one observation per month, per stock (in case of two same returns)
+  - Remove the duplicates / keep only the first observation
+
+```{r monthlyMaxReturns}
+# Filter data into a new data frame and create a new column to indicate the month
+data <- data %>% 
+  mutate(month = floor_date(datadate, unit = "month"))
+
+# Calculate Monthly mean returns into a new data frame
+data_monthly <- data %>% 
+  # Group your data by the "tic" and "month" columns
+  group_by(tic, month) %>% 
+  # Add a new column called 'max_returns' to store the max value of returns
+  mutate(max_returns = max(returns)) %>% 
+  # Return unique combinations of values for 'tic' and 'month' columns while 
+  # preserving all other columns in the original data frame.
+  distinct(tic, month, .keep_all = TRUE) %>%  
+  # Remove grouping
+  ungroup()
+
+# Omit the NA values
+data_monthly <- na.omit(data_monthly)
+# Omit the infinite values
+data_monthly[is.finite(data_monthly$returns), ]
+
+# Check the first few rows
+head(data_monthly)
+
+```
+
+Part II 
+
+Perform a decile group analysis on a specific
+month within the data set. Create a new data frame from the
+data frame created. Categorise the maximum daily
+returns from that month into decile groups, labelled 10%, 20%, ..., 90%, 100% .
+
+Identify a stock in a certain decile based on
+some criteria. The decile and criteria will be given in each section below.
+
+**NOTES**
+- For the quantile algorithm, use `type = 5`
+- Use functions to create `probs` and `labels`
+
+A
+
+Consider only the month of March 2023, and create decile groups.
+```{r decilesA}
+# Create a new data frame 'dataA' based on 'data'
+dataA <- data_monthly %>% 
+  # Add a new column 'month' containing the start date of the month for each 
+  # corresponding 'datadate' value
+  mutate(month = floor_date(datadate, unit = "month")) %>% 
+  # Filter rows where the 'month' column is equal to '2023-03-01', for March 2023
+  filter(month == "2023-03-01") %>% 
+  # Filter rows without zero returns
+  filter(returns != 0) %>% 
+  # Filter rows with finite returns value
+  filter(is.finite(returns))
+
+# Remove the NA values
+dataA <- na.omit(dataA)
+  
+# Create a new variable that categorizes the values in 'returns' column into percentiles
+dataA$percentiles <- cut(dataA$returns,
+                         breaks = quantile(dataA$returns,
+                                           probs = seq(0, 1, by = 0.1),
+                                           type = 5,
+                                           na.rm = TRUE),
+                         include.lowest = TRUE,
+                         labels = paste0(seq(10, 100, by = 10),"%"))
+# Check for the first few rows
+head(dataA)
+```
+
+Choose the stock matching the following criteria:
+- lowest return in the 100% decile group
+  
+Display the stock in a pretty table with 8 columns showing this information:
+- GVKEY, iid, date, company name, trading volume, closing price, return, decile
+
+```{r selectA}
+# Create a new data frame
+lowest_dataA <- dataA %>% 
+  # Filter the rows for 100% percentiles
+  filter(percentiles == "100%") %>% 
+  # Arrange the data frame based on 'returns' and then extract the first row. 
+  arrange(returns) %>% 
+  .[1, ]
+
+lowest_dataA <- lowest_dataA %>% 
+  # Select the following 8 colums
+  select(tic, GVKEY, iid, datadate, conm, cshtrd, prccd, returns, percentiles)
+
+
+# Create a table to display 'lowest_dataA' in a more readable format.
+kable(lowest_dataA, caption = "Lowest return in the 10th Decile for March 2023")
+```
+
+
+
+B
+
+Consider only the month of February 2023, and create decile groups.
+```{r decilesB}
+# Create a new data frame 'dataB' based on 'data'
+dataB <- data_monthly %>% 
+  # Add a new column 'month' containing the start date of the month for each 
+  # corresponding 'datadate' value
+  mutate(month <- format(datadate, "%m")) %>% 
+  # Filter rows where the 'month' column is equal to '2023-02-01', for February 2023
+  filter(month == "2023-02-01") %>% 
+  # Filter rows without zero returns
+  filter(returns != 0) %>% 
+  # Filter rows with finite returns value
+  filter(is.finite(returns))
+
+# Filter rows with NA value
+dataB <- na.omit(dataB)
+
+# Create a new variable called 'percentiles' that categorizes the values in 
+# 'returns' column into percentiles
+dataB$percentiles <- cut(dataB$returns,
+                         breaks = quantile(dataB$returns,
+                                           probs = seq(0, 1, by = 0.1),
+                                           type = 5,
+                                           na.rm = TRUE),
+                         include.lowest = TRUE,
+                         labels = paste0(seq(10, 100, by = 10),"%"))
+# Check the front few rows
+head(dataB)
+```
+
+Choose the stock matching the following criteria:
+- lowest return in the 80% decile group
+  
+Display the stock in a pretty table with 8 columns showing this information:
+- GVKEY, iid, date, company name, trading volume, closing price, return, decile
+
+```{r selectB}
+# Create a new data frame
+lowest_dataB <- dataB %>% 
+  # Filter the rows for 80% percentiles
+  filter(percentiles == "80%") %>% 
+  # Arrange the data frame based on 'returns'.
+  arrange(returns) %>%
+  # Select only the following 8 columns
+  select(tic,GVKEY, iid, datadate, conm, cshtrd, prccd, returns, percentiles) %>% 
+  # Display the first row of' data frame'lowest_dataB'
+  head(n = 1)
+
+# Create a table to display 'lowest_dataB' in a more readable format.
+kable(lowest_dataB, caption = "Lowest return in the 8th Decile for February 2023")
+
+
+```
+
+C
+
+Consider only the month of January 2023, and create decile groups.
+```{r decilesC}
+# Filter data into a new data frame and create a new column to indicate the month
+dataC <- data_monthly %>% 
+  mutate(month <- format(datadate, "%m")) %>% 
+  filter(month == "2023-01-01") %>% 
+  filter(returns != 0) %>% 
+  filter(is.finite(returns))
+
+# Remove NA values
+dataC <- na.omit(dataC)
+
+# Create a new column to indicate the decile group
+dataC$percentiles <- cut(dataC$returns,
+                         breaks = quantile(dataB$returns,
+                                           probs = seq(0, 1, by = 0.1),
+                                           type = 5,
+                                           na.rm = TRUE),
+                         include.lowest = TRUE,
+                         labels = paste0(seq(10, 100, by = 10),"%"))
+
+head(dataC)
+```
+
+Choose the stock matching the following criteria:
+- highest return in the 20% decile group
+  
+Display the stock in a pretty table with 8 columns showing this information:
+- GVKEY, iid, date, company name, trading volume, closing price, return, decile
+
+```{r selectC}
+# Select the stock with the highest return in the 20% decile group
+highest_dataC <- dataC %>% 
+  filter(percentiles == "20%") %>% 
+  arrange(desc(returns)) %>%
+  select(tic, GVKEY, iid, datadate, conm, cshtrd, prccd, returns, percentiles) %>% 
+  # Display the first row of' data frame'highest_dataD'
+  head(n = 1)
+highest_dataC
+# Display the stock in a pretty table
+kable(highest_dataC, caption = "Highest return in the 2nd Decile for January 2023")
+```
+
+D
+
+Consider only the month of December 2022, and create decile groups.
+```{r decilesD}
+# Create a new data frame 'dataD'.
+dataD <- data_monthly %>% 
+  # Create a new variable called 'month' based on 'datadate' column.
+  mutate(month = floor_date(datadate, unit = "month")) %>% 
+  # Filter the rows with month of December 2022, with non-zero returns, 
+  # and finite values
+  filter(month == "2022-12-01") %>% 
+  filter(returns != 0) %>% 
+  filter(is.finite(returns))
+
+# Omit the NAs
+dataD <- na.omit(dataD)
+  
+# Create a new column to indicate the decile group based on the returns
+dataD$percentiles <- cut(dataD$returns,
+                         breaks = quantile(dataD$returns,
+                                           probs = seq(0, 1, by = 0.1),
+                                           type = 5,
+                                           na.rm = TRUE),
+                         include.lowest = TRUE,
+                         labels = paste0(seq(10, 100, by = 10),"%"))
+
+# Check the first few rows
+head(dataD)
+
+```
+
+Choose the stock matching the following criteria:
+- highest return in the 60% decile group
+  
+Display the stock in a pretty table with 8 columns showing this information:
+- GVKEY, iid, date, company name, trading volume, closing price, return, decile
+
+```{r selectD}
+# Create a new data frame 'highest_dataD', to store the filtered rows with 
+# highest return in the 60% decile group, and select the specific 8 columns
+highest_dataD <- dataD %>% 
+  filter(percentiles == "60%") %>% 
+  arrange(desc(returns)) %>%
+  select(tic, GVKEY, iid, datadate, conm, cshtrd, prccd, returns, percentiles) %>% 
+  # Display the first row of' data frame'highest_dataD'
+  head(n = 1)
+
+# Display the results in an appropriate formatted table
+kable(highest_dataD, caption = "Highest return in the 6th Decile for December 2022")
+
+```
+
+E
+
+Consider only the month of November 2022, and create decile groups.
+```{r decilesE}
+# Create a new data frame called 'dataE'
+dataE <- data_monthly %>% 
+  # Add a new variable 'month' and round each date to the beginning of the 
+  # respective month.
+  mutate(month = floor_date(datadate, unit = "month")) %>% 
+  # Filter the rows representing the month of November 2022, with non-zero returns,
+  # and only finite values
+  filter(month == "2022-11-01") %>% 
+  filter(returns != 0) %>% 
+  filter(is.finite(returns))
+
+# Omit the NA values in 'dataE'
+dataE <- na.omit(dataE)
+  
+# Add a new variable 'percentiles' that categorizes the 'returns' into percentiles 
+# with the specified labels
+dataE$percentiles <- cut(dataE$returns,
+                         breaks = quantile(dataA$returns,
+                                           probs = seq(0, 1, 0.1),
+                                           type = 5,
+                                           na.rm = TRUE),
+                         include.lowest = TRUE,
+                         labels = paste0(seq(10, 100, by = 10),"%"))
+
+# Check the first few rows of 'dataE'
+head(dataE)
+```
+
+Choose the stock matching the following criteria:
+- lowest return in the 30% decile group
+  
+Display the stock in a pretty table with 8 columns showing this information:
+- GVKEY, iid, date, company name, trading volume, closing price, return, decile
+
+```{r selectE}
+# Create a new data frame called 'lowest_dataE'
+lowest_dataE <- dataE %>% 
+  # Filter the percentile of 30%
+  filter(percentiles == "30%") %>% 
+  # Arrange the data frame based on returns 
+  arrange(returns) %>%
+  # Select only the information in 8 columns
+  select(tic,GVKEY, iid, datadate, conm, cshtrd, prccd, returns, percentiles) %>% 
+  # Display the first row of data frame 'lowest_dataE'
+  head(n = 1)
+lowest_dataE
+
+# Create a table to display 'lowest_dataE' in a pretty format.
+kable(lowest_dataE, caption = "Lowest return in the 3rd Decile for November 2022")
+
+```
+
+--END--
+
