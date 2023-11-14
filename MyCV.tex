@@ -1,0 +1,280 @@
+%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\setlength{\multicolsep}{-3.0pt}
+\setlength{\columnsep}{-1pt}
+\input{glyphtounicode}
+\usepackage{hyperref}
+\hypersetup{
+	unicode=true,                 % non-Latin characters in Acrobat bookmarks
+	pdftoolbar=true,              % show Acrobat toolbar?
+	pdfmenubar=true,              % show Acrobat menu?
+	pdffitwindow=true,            % page fit to window when opened
+	pdfsubject={},                % subject of the document
+	pdfnewwindow=true,            % links in new window
+	pdfkeywords={},               % list of keywords
+	colorlinks=true,              % false: boxed links; true: colored links
+	linkcolor=black,              % color of internal links
+	citecolor=black,              % color of links to bibliography
+	filecolor=black,              % color of file links
+	urlcolor=blue                 % color of external links
+}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage[numbers]{natbib}
+\usepackage{notoccite}
+\usepackage{enumitem}
+\setlist*[itemize]{labelindent=\parindent,itemindent=0pt,leftmargin=3cm}
+ 
+%----------FONT OPTIONS----------
+% \usepackage{helvet}
+% \renewcommand{\familydefault}{\sfdefault}
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+%% \usepackage[sfdefault]{roboto}
+%% \usepackage[sfdefault]{noto-sans}
+%% \usepackage[default]{sourcesanspro}
+\usepackage{lmodern}
+
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.19in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\centering\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item \small{#1 \vspace{-3pt}}
+}
+
+\newcommand{\classesList}[4]{
+    \item\small{
+        {#1 #2 #3 #4 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\educationSubheading}[8]{
+  \vspace{-2pt}\item
+      \begin{tabular*}{1.0\textwidth}[t]{p{2.5cm}p{15.05cm}l}
+    \textbf{\small #1} & \textbf{\small #2} & \textbf{\small #3} \\
+    \textit{\small#4} & \textit{\small #5} & \textit{\small #6} \\
+    \textit{\small#7} & \multicolumn{2}{p{17cm}}{\small #8} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\edalevel}[6]{
+  \vspace{-2pt}\item
+      \begin{tabular*}{1.0\textwidth}[t]{p{2.5cm}p{15.05cm}l}
+    \textbf{\small #1} & \textbf{\small #2} & \textbf{\small #3} \\
+    \textit{\small#4} & \textit{\small #5} & \textit{\small #6} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubheading}[6]{
+  \vspace{-2pt}\item
+  \begin{tabular*}{1.0\textwidth}[t]{p{2.5cm}p{15.05cm}l}
+    \textbf{\small #1} & \textbf{\small #2} & \textbf{\small #3} \\
+    \textit{\small#4} & \textit{\small #5} & \textit{\small #6} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\achieveSubheading}[3]{
+  \vspace{-2pt}\item
+  \begin{tabular*}{1.0\textwidth}[t]{p{2.5cm}p{15.05cm}l}
+    \textbf{\small #1} & \textbf{\small #2} & \textbf{\small #3} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\skillsSubheading}[6]{
+  \vspace{-2pt}\item
+      \begin{tabular*}{1.0\textwidth}[t]{p{2.5cm}p{17cm}l}
+    \textbf{\small #1} & \textbf{\small #2} & \textbf{\small #3} \\
+    \textit{\small#4} & \textit{\small #5} & \textit{\small #6} \\
+  \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\skillsSubheadingg}[3]{
+  \vspace{-6pt}\item
+      \begin{tabular*}{1.0\textwidth}[t]{p{2.5cm}p{17cm}l}
+    \textit{\small#1} & \textit{\small #2} & \textit{\small #3} \\
+  \end{tabular*}\vspace{-12pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{1.001\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & \textbf{\small #2}\\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{center}
+    {\Large \scshape EDWARD PETERSON} \\ \vspace{1pt}\hspace{14pt}
+    \small \raisebox{-0.1\height}\faPhone\ 07931 236 094 |~ \href{mailto:ep4518@ic.ac.uk}{\raisebox{-0.2\height}\faEnvelope\  edward.peterson18@imperial.ac.uk} |~ 
+    \href{https://uk.linkedin.com/in/edward-peterson-166958185}{\raisebox{-0.2\height}\faLinkedin\ \underline{Edward Peterson}}  ~
+
+\end{center}
+
+\def\Cplusplus{C\raisebox{0.5ex}{\tiny\textbf{++}}}
+%-----------HIGHER EDUCATION-----------
+\section{\small EDUCATION}
+\vspace{5pt}
+\resumeSubHeadingListStart
+    \educationSubheading
+      {2023 - 2024}{Imperial College Business School}{London, UK}
+      {}{MSc Financial Technology}{}
+      {}{Core modules: Accounting and Corporate Finance, Big Data in Finance, Blockchain and Applications, Financial Econometrics in R/Python, Investments and Portfolio Management, Mathematics for Finance \newline Electives: Computational Finance with \Cplusplus, Advanced Options Theory, Market Microstructure: Trading and Liquidity, Asset Allocation and Investment Strategies, Derivatives}
+    \educationSubheading
+      {2022 - 2023}{University of Bristol}{Bristol, UK}
+      {}{MSc Economics \& Finance (Distinction)}{}
+      {}{Empirical dissertation: Volatility Spillovers between Energy and the EU ETS Carbon Markets \newline Core modules: Microeconomics, Macroeconomics, Econometrics, Applied Econometrics, Asset Pricing  
+}
+    \educationSubheading
+      {2019 - 2022}{University of Bristol}{Bristol, UK}
+      {}{BEng Engineering Mathematics (Second Class Honours - First Division)}{}
+      {}{Core modules: Mathematical and Data Modelling, Continuum Mathematics, Introduction to AI, Applied Statistics, Applied Optimisation Theory, Non-linear Dynamics and Chaos, Computational Neuroscience, Control Theory}
+    \edalevel{2017 - 2018}{Sixth Form}{London, UK}{}{Mathematics - $A^*$, Further Mathematics - $A^*$, Physics - $A^*$}{}
+\resumeSubHeadingListEnd
+
+\section{\small\centering PROFESSIONAL EXPERIENCE}
+\vspace{5pt}
+\resumeSubHeadingListStart
+    \resumeSubheading
+     {2023}{The Pensions Regulator}{Brighton, UK}
+     {}{Investments Intern}{}
+         \resumeItemListStart
+            \resumeItem{Projected total asset quantities of DB and DC pension schemes to forecast a market majority switching date \newline ($\sim$ 2030) in varying scenarios. Presented findings to actuarial and investment teams}
+            \resumeItem{Produced a research report on use of, and diversification benefits of LTAF illiquid investments for DC pension schemes in context of productive finance investment, similarly presented findings}
+            \resumeItem{Completed the Trustee toolkit and investigated LDI crisis for personal development}
+        \resumeItemListEnd
+
+    \resumeSubheading
+      {2023}{University of Bristol}{Bristol, UK}
+      {}{Research Project: Volatility Spillovers between Energy and the EU ETS Carbon Markets}{}
+        \resumeItemListStart
+            \resumeItem{Reviewed emissions trading systems literature within broader literature of climate finance}
+            \resumeItem{Modelled dynamic correlations using multivariate GARCH methods (rmgarch package), including simulated univariate parameter density analysis and Granger causality volatility transmission tests}
+            \resumeItem{Wrote a 15,000 word thesis for submission. Reported summary to dissertation supervision group}
+        \resumeItemListEnd
+    \resumeSubheading
+      {2022}{University of Bristol}{Bristol, UK}
+      {}{Group Technical Project: The Million Playlist Dataset Challenge}{}
+        \resumeItemListStart
+            \resumeItem{Proposed a single stage, content-based filtering method of automatic playlist continuation utilising ANN (annoy) clustering, based on song feature vectors retrieved from the Spotify API, evaluated with Davies-Bouldin score and variance ratio criterion. TF-IDF NLP used for non-numeric features}
+            \resumeItem{Led project and coordinated 4 team members, ultimately submitting a 10 page technical report}
+            \resumeItem{Engaged with competition resources and metrics to determine overall APC performance}
+        \resumeItemListEnd
+    % \resumeSubheading
+    %   {2021}{LGT Vestra Wealth Management}{London, UK}
+    %   {}{Work Placement}{}
+\resumeSubHeadingListEnd
+%
+\section{\small ACHIEVEMENTS \& LEADERSHIP}
+\vspace{5pt}
+\resumeSubHeadingListStart
+    \achieveSubheading{2017 - 2018}{School Rugby}{London, UK}
+        \resumeItemListStart
+            \resumeItem{Captained 3\textsuperscript{rd} XV and subsequently represented 1\textsuperscript{st} XV}
+            \resumeItem{Represented 1\textsuperscript{st} Team at National VIIs Tournament in consecutive years}
+        \resumeItemListEnd
+    \achieveSubheading{2015 - 2016}{National Schools Rowing}{London, UK}
+        \resumeItemListStart
+                \resumeItem{Achieved two consecutive National Schools Rowing Men's Eights gold medals}
+        \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+        
+%-----------PROGRAMMING SKILLS-----------
+\section{\small ADDITIONAL SKILLS \& QUALIFICATIONS}
+\vspace{5pt}
+\resumeSubHeadingListStart
+    \skillsSubheading{}{TECHNICAL SKILLS}{}{}{Proficient in: Python, R, MATLAB, Excel, LaTeX, Git}{}
+    \skillsSubheadingg{}{Experience in: C, JavaScript, VBA, SQL, Bloomberg Terminal, Eikon Terminal, MS Office (misc.)}{}
+    \skillsSubheading{}{LANGUAGES}{}{}{English (native), German (basic)}{}
+    \skillsSubheading{}{CERTIFICATIONS}{}{}{GMAT:{ \textsc{Total} 700 \textit{(87th)} $|$ VR 36 \textit{(79th)} $|$ QR 48 \textit{(65th)} $|$ IR 7 \textit{(79th)} $|$ AW 5.0 \textit{(56th)}} $|$ 1st Attempt - 11/03/23}{}
+    \skillsSubheadingg{}{Harvard CS50: Introduction to Computer Science}{}
+    
+\resumeSubHeadingListEnd
+
+\section{\small EXTRA CURRICULAR ACTIVITIES}
+\vspace{5pt}
+\resumeItemListStart
+\resumeItem{Imperial College Business School Student Investment Fund Quantitative Analyst \& ICL AlgoTrading Society}
+\vspace{-4pt}
+\resumeItem{Volunteered for 1-on-1 student mentoring in A-Level maths at Church of England Business \& Enterprise College }
+
+\resumeItemListEnd
+
+
+\end{document}
+
